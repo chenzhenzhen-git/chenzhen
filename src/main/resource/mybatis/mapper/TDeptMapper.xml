@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bonc.dxbrgrmp.dao.mybatis.mapper.TDeptMapper">
+
+  <!--查询TempTree这一列应该填入的数据和dept_id-->
+  <select id="selectTempTree" resultType="com.bonc.dxbrgrmp.pojo.po.TDept">
+    select c.dept_id deptId ,CONCAT_WS("|",A.dept_id ,B.dept_id,C.dept_id) as deptTree
+    from t_dept C  Left JOIN t_dept B on   C.parent_dept_id=B.dept_id
+                   LEFT  JOIN t_dept A on B.parent_dept_id=A.dept_id  where A.parent_dept_id is NULL
+  </select>
+
+<!--更新dept_tree这一列的数据-->
+  <update id="updateTreeInfo" parameterType="map" >
+    update t_dept set  dept_tree=#{deptTree} where dept_id=#{deptId}
+  </update>
+
+  <resultMap id="BaseResultMap" type="com.bonc.dxbrgrmp.pojo.po.TDept">
+    <!--@mbg.generated-->
+    <id column="dept_id" jdbcType="INTEGER" property="deptId" />
+    <result column="dept_name" jdbcType="VARCHAR" property="deptName" />
+    <result column="dept_short_name" jdbcType="VARCHAR" property="deptShortName" />
+    <result column="parent_dept_id" jdbcType="INTEGER" property="parentDeptId" />
+    <result column="o_dept_id" jdbcType="VARCHAR" property="oDeptId" />
+    <result column="dept_type" jdbcType="TINYINT" property="deptType" />
+    <result column="dept_no" jdbcType="VARCHAR" property="deptNo" />
+    <result column="region_id" jdbcType="INTEGER" property="regionId" />
+    <result column="dept_tree" jdbcType="VARCHAR" property="deptTree" />
+  </resultMap>
+
+
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    dept_id, dept_name, dept_short_name, parent_dept_id, o_dept_id, dept_type, dept_no, 
+    region_id, dept_tree
+  </sql>
+
+</mapper>

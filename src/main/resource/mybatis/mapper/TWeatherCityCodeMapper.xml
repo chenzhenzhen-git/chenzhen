@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bonc.dxbrgrmp.dao.mybatis.mapper.TWeatherCityCodeMapper">
+
+  <!--通过region_id查询site_region_code,sity_url-->
+  <select id="selectSiteRegionAndSityUrlCodeByRegionId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select site_region_code,sity_url from t_weather_city_code where region_id=#{regionId,jdbcType=INTEGER};
+  </select>
+
+
+  <resultMap id="BaseResultMap" type="com.bonc.dxbrgrmp.pojo.po.TWeatherCityCode">
+    <!--@mbg.generated-->
+    <id column="t_id" jdbcType="INTEGER" property="tId" />
+    <result column="sity_name" jdbcType="VARCHAR" property="sityName" />
+    <result column="sity_url" jdbcType="VARCHAR" property="sityUrl" />
+    <result column="region_id" jdbcType="INTEGER" property="regionId" />
+    <result column="site_region_code" jdbcType="VARCHAR" property="siteRegionCode" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    t_id, sity_name, sity_url, region_id, site_region_code
+  </sql>
+
+
+
+
+
+</mapper>

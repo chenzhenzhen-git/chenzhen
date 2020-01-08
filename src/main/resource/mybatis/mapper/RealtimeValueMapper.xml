@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bonc.dxbrgrmp.dao.mybatis.mapper.RealtimeValueMapper">
+    <resultMap id="BaseResultMap" type="com.bonc.dxbrgrmp.pojo.po.RealtimeValue">
+        <id column="data_id" property="dataId" />
+        <result column="data_value" property="dataValue" />
+        <result column="data_time" property="dataTime" />
+        <result column="energy_cost" property="energyCost" />
+        <result column="minus_value" property="minusValue" />
+        <result column="rtcFlowId" property="rtcFlowId" />
+        <result column="point_id" property="pointId" />
+        <result column="device_id" property="deviceId" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        data_id, data_value, data_time, energy_cost, minus_value, rtcFlowId, point_id, device_id
+    </sql>
+
+    <select id="getLightDayEle" resultType="java.lang.Double">
+      SELECT sum(r.minus_value) FROM t_realtime_value r, t_datapoint p
+      WHERE r.point_id = p.point_id
+      <if test="dateStr != null and dateStr != ''">
+        AND r.data_time &gt;= #{dateStr}
+      </if>
+      and p.point_status != 3
+      AND p.type_id = 4001
+    </select>
+
+    <select id="getWindDayEle" resultType="java.lang.Double">
+      SELECT sum(r.minus_value) FROM t_realtime_value r, t_datapoint p
+      WHERE r.point_id = p.point_id
+      <if test="dateStr != null and dateStr != ''">
+          AND r.data_time &gt;= #{dateStr}
+      </if>
+      and p.point_status != 3
+      AND p.type_id = 5002
+    </select>
+
+    <select id="getLightEleRate" resultType="java.lang.Double">
+      SELECT r.data_value FROM t_realtime_value r, t_datapoint p
+      WHERE r.point_id = p.point_id and r.data_time &gt;= DATE_SUB(curdate(),INTERVAL 15 DAY)
+      AND p.type_id = 4010 ORDER BY r.data_time DESC LIMIT 1
+    </select>
+
+    <select id="getWindEleRate" resultType="java.lang.Double">
+      SELECT r.data_value FROM t_realtime_value r, t_datapoint p
+      WHERE r.point_id = p.point_id and r.data_time &gt;= DATE_SUB(curdate(),INTERVAL 15 DAY)
+      AND p.type_id = 5001 ORDER BY r.data_time DESC LIMIT 1
+    </select>
+
+    <select id="getLightAndWindEleTotalRate" resultType="java.lang.Double">
+      SELECT ifnull(round(sum(r.data_value), 2), 0) FROM t_realtime_value r, (
+        SELECT r.point_id, MAX(r.data_time) data_time FROM t_realtime_value r
+        WHERE r.point_id in
+        <foreach collection="pointIdList" item="pointId" open="(" separator="," close=")">
+          #{pointId}
+        </foreach>
+        GROUP BY r.point_id
+      ) t WHERE r.point_id = t.point_id AND r.data_time = t.data_time
+    </select>
+
+    <select id="getNewEnergyRateYearLineData" resultType="java.util.Map">
+      SELECT t.dataTime xdata, sum(t.dataValue) ydata FROM (
+        SELECT point_id, DATE_FORMAT(data_time, '%c月') dataTime, avg(data_value) dataValue FROM t_daily_statistic
+        WHERE data_time &gt;= #{startTime} AND data_time &lt; #{endTime} AND point_id in
+        <foreach collection="newEnergyDataPointIdList" item="pointId" open="(" separator="," close=")">
+          #{pointId}
+        </foreach>
+        GROUP BY point_id, dataTime
+      ) t GROUP BY xdata
+    </select>
+
+    <select id="getNewEnergyRateYearLineDataCurrentYear" resultType="java.util.Map">
+      SELECT t1.tempTime xdata, sum(dataValue) ydata FROM(
+        SELECT t.point_id, DATE_FORMAT(t.dataTime, '%c月') tempTime, avg(t.dataValue) dataValue FROM (
+          SELECT point_id, data_value dataValue, data_time dataTime FROM t_daily_statistic
+          WHERE data_time &gt;= #{startTime} AND data_time &lt; #{endTime}
+          and point_id in
+          <foreach collection="newEnergyDataPointIdList" item="pointId" open="(" separator="," close=")">
+            #{pointId}
+          </foreach>
+          UNION ALL
+          SELECT point_id, avg(data_value) dataValue, DATE_FORMAT(data_time, '%Y-%m-%d') dataTime FROM t_realtime_value
+          WHERE data_time &gt;= CURDATE() AND point_id in
+          <foreach collection="newEnergyDataPointIdList" item="pointId" open="(" separator="," close=")">
+            #{pointId}
+          </foreach> GROUP BY point_id, dataTime
+        ) t GROUP BY t.point_id, tempTime
+      ) t1 GROUP BY t1.tempTime
+    </select>
+
+    <select id="getNewEnergyRateMonthLineData" resultType="java.util.Map">
+      SELECT sum(data_value) ydata, DATE_FORMAT(data_time, '%e') xdata FROM t_daily_statistic
+      WHERE data_time &gt;= #{startTime} AND data_time &lt; #{endTime} AND point_id in
+      <foreach collection="newEnergyDataPointIdList" item="pointId" open="(" separator="," close=")">
+        #{pointId}
+      </foreach>
+      GROUP BY xdata
+    </select>
+
+    <select id="getNewEnergyRateMonthLineDataCurrentMonth" resultType="java.util.Map">
+      SELECT sum(dataValue) ydata, DATE_FORMAT(dataTime, '%e') xdata FROM (
+        SELECT data_value dataValue, data_time dataTime FROM t_daily_statistic
+        WHERE data_time &gt;= #{startTime} AND data_time &lt; #{endTime}
+        AND point_id in
+        <foreach collection="newEnergyDataPointIdList" item="pointId" open="(" separator="," close=")">
+          #{pointId}
+        </foreach>
+        UNION ALL
+        SELECT avg(data_value) dataValue, DATE_FORMAT(data_time, '%Y-%m-%d') dataTime FROM t_realtime_value
+        WHERE data_time &gt;= CURDATE() AND point_id in
+        <foreach collection="newEnergyDataPointIdList" item="pointId" open="(" separator="," close=")">
+          #{pointId}
+        </foreach> GROUP BY dataTime
+      ) t GROUP BY xdata
+    </select>
+
+    <select id="getNewEnergyRateDayLineData" resultType="java.util.Map">
+      SELECT sum(t.dataValue) ydata, t.dataTime xdata FROM (
+        SELECT point_id, avg(data_value) dataValue, DATE_FORMAT(data_time, '%H') dataTime FROM t_realtime_value
+        WHERE data_time &gt;= #{startTime} AND data_time &lt; #{endTime} and point_id in
+        <foreach collection="newEnergyDataPointIdList" item="pointId" open="(" separator="," close=")">
+          #{pointId}
+        </foreach>
+        GROUP BY point_id, dataTime
+      ) t GROUP BY t.dataTime
+    </select>
+
+  <select id="getNoneDateTimes" resultType="java.lang.Long">
+    SELECT TIMESTAMPDIFF(MINUTE, MAX(data_time), NOW()) FROM t_realtime_value
+  </select>
+</mapper>

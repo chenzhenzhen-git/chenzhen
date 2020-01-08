@@ -1,0 +1,75 @@
+#服务
+server:
+  port: 8080
+  servlet:
+    context-path: /dxbrgrmp
+#spring
+spring:
+  profiles:
+    active: dev
+  datasource:
+      type: com.alibaba.druid.pool.DruidDataSource
+      # 初始化大小，最小，最大
+      initialSize: 10
+      minIdle: 8
+      maxActive: 100
+      # 配置获取连接等待超时的时间
+      maxWait: 2000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      timeBetweenEvictionRunsMillis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      minEvictableIdleTimeMillis: 30000
+      validationQuery: select 'x'
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      # 打开PSCache，并且指定每个连接上PSCache的大小
+      poolPreparedStatements: true
+      maxPoolPreparedStatementPerConnectionSize: 20
+      # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+      filters: stat,wall,slf4j
+      # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+      # 合并多个DruidDataSource的监控数据
+      useGlobalDataSourceStat: true
+
+#  flyway
+  flyway:
+    baseline-on-migrate: true
+
+#mybatis
+#mybatis:
+#  config-location: classpath:mybatis/config/mybatis-config.xml
+#  mapper-locations: classpath:mybatis/mapper/*.xml
+
+#logback
+logging:
+  config: classpath:logback-spring.xml
+  level:
+    com:
+      bonc:
+        dxbrgrmp:
+          dao:
+            mybatis:
+              mapper: debug
+          portal:
+            dao:
+              mapper: debug
+
+jasypt:
+  encryptor:
+    password: aJCyEqTfA4xEcCPrygg==
+
+statisticTask:
+  #统计任务开关
+  switch: true
+  hourly-cron: 0 3 * * * *
+  daily-cron: 0 10 0 * * *
+  daily-first-end-cron: 0 5 0 * * *
+  backup-realtime-value-cron: 0 20 0 * * *
+  rebuildRealtimeTableIndex: 0 0 1 1,15 * ?
+
+cloudiip:
+  apiurl:
+    token: http://cas.test.cloudiip.bonc.local/cloudiip/jwt/token
+    asset_tree: http://access-equipment.test.cloudiip.bonc.local/api/asset/queryTree

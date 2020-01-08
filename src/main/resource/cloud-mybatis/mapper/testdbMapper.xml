@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bonc.dxbrgrmp.dao.mybatis.cloudmapper.TestdbMapper">
+    <resultMap id="BaseResultMap" type="com.bonc.dxbrgrmp.pojo.po.Testdb">
+        <id column="testid" property="testId" />
+        <result column="testfloat" property="testFloat" />
+        <result column="testdouble" property="testDouble" />
+        <result column="testbigint" property="testBigInt" />
+        <result column="name" property="name" />
+        <result column="name3" property="name3" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        testid, testfloat, testdouble, testbigint, name,name3
+    </sql>
+    <select id="selectDbAll" resultMap="BaseResultMap">
+        select testid,testfloat,testdouble,testbigint,name,name3 from test1
+    </select>
+</mapper>

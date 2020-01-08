@@ -1,0 +1,29 @@
+#测试环境数据库配置
+yw:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbc-url: jdbc:mysql://172.16.61.8:3306/dxbrgr?autoReconnect=true&&useTimezone=true&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF8&useSSL=true&allowMultiQueries=true
+    username: root
+    password: Bonc1234!
+    #username: ENC(V2pjcqbF3lkzhsoVJ+EyKw==)
+    #password: ENC(Z4yrZlntTTbnyfe8lghSdw77PNUDRute)
+portal:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbc-url: jdbc:mysql://172.16.61.8:3306/portal?autoReconnect=true&&useTimezone=true&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF8&useSSL=true
+    username: root
+    password: Bonc1234!
+#    password: root
+    #username: ENC(V2pjcqbF3lkzhsoVJ+EyKw==)
+    #password: ENC(Z4yrZlntTTbnyfe8lghSdw77PNUDRute)
+cloudiip:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbc-url: jdbc:mysql://172.16.61.8:3306/jbfd?autoReconnect=true&&useTimezone=true&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF8&useSSL=true
+    username: root
+    password: Bonc1234!
+    #    password: root
+    #username: ENC(V2pjcqbF3lkzhsoVJ+EyKw==)
+    #password: ENC(Z4yrZlntTTbnyfe8lghSdw77PNUDRute)
+
+
